@@ -45,15 +45,15 @@ const importFromGoogleSheets = async (updateDataCallback) => {
     const csvText = await response.text();
     
     // הפיכת ה-CSV למערך של אובייקטים
-    const lines = csvText.split('\n');
-    const headers = lines[0].split(',');
+    const lines = csvText.trim().split('\n').filter(line => line.trim() !== '');
+    const headers = lines[0].split(/[,;]/).map(h => h.trim());
     const result = [];
 
     for (let i = 1; i < lines.length; i++) {
       const obj = {};
-      const currentline = lines[i].split(',');
+      const currentline = lines[i].split(/[,;]/).map(v => v.trim());
       headers.forEach((header, index) => {
-        obj[header.trim()] = currentline[index]?.trim();
+        obj[header] = currentline[index];
       });
       result.push(obj);
     }
