@@ -52,10 +52,18 @@ const importFromGoogleSheets = async (updateDataCallback) => {
     for (let i = 1; i < lines.length; i++) {
       const obj = {};
       const currentline = lines[i].split(/[,;]/).map(v => v.trim());
+      
       headers.forEach((header, index) => {
-        obj[header] = currentline[index];
+        // אנחנו מוסיפים את הנתון רק אם יש לו כותרת והוא לא ריק
+        if (header && currentline[index] !== undefined) {
+          obj[header] = currentline[index] || null; // אם ריק, נשלח null
+        }
       });
-      result.push(obj);
+
+      // בדיקה: מוסיפים רק אם האובייקט לא ריק
+      if (Object.keys(obj).length > 0) {
+        result.push(obj);
+      }
     }
 
     // שליחת הנתונים ל-Database
