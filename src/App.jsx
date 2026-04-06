@@ -38,7 +38,7 @@ const db = {
   getAllActions: () => api("actions?select=*"),
 };
 const importFromGoogleSheets = async (updateDataCallback) => {
-  const SHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSAd1CU3UtHejY7W0ulzY6_Zuu50yvW3jMKls-DuRxK805Q9SIiTVelddc5V-UCcdmTp5kEzSUIMc7u/pub?gid=1837800417&single=true&output=csv";
+  const SHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSAd1CU3UtHejY7W0ulzY6_Zuu50yvW3jMKls-DuRxK805Q9SIiTVelddc5V-UCcdmTp5kEzSUIMc7u/pub?gid=247038876&single=true&output=csv";
   
   try {
     const response = await fetch(SHEET_URL);
