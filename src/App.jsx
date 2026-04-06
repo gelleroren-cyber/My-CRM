@@ -37,6 +37,38 @@ const db = {
   getAllTasks: () => api("tasks?select=*"),
   getAllActions: () => api("actions?select=*"),
 };
+const importFromGoogleSheets = async (updateDataCallback) => {
+  const SHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSAd1CU3UtHejY7W0ulzY6_Zuu50yvW3jMKls-DuRxK805Q9SIiTVelddc5V-UCcdmTp5kEzSUIMc7u/pub?gid=1837800417&single=true&output=csv";
+  
+  try {
+    const response = await fetch(SHEET_URL);
+    const csvText = await response.text();
+    
+    // הפיכת ה-CSV למערך של אובייקטים
+    const lines = csvText.split('\n');
+    const headers = lines[0].split(',');
+    const result = [];
+
+    for (let i = 1; i < lines.length; i++) {
+      const obj = {};
+      const currentline = lines[i].split(',');
+      headers.forEach((header, index) => {
+        obj[header.trim()] = currentline[index]?.trim();
+      });
+      result.push(obj);
+    }
+
+    console.log("נתונים שיובאו:", result);
+    alert(`זוהו ${result.length} שורות מהטבלה!`);
+    
+    // אם יש לך פונקציה שמעדכנת את התצוגה, נפעיל אותה כאן
+    if (updateDataCallback) updateDataCallback(result);
+
+  } catch (error) {
+    console.error("שגיאה בייבוא:", error);
+    alert("שגיאה במשיכת הנתונים. וודא שהטבלה פורסמה כ-CSV.");
+  }
+};
 
 const STAGES = ["Neuer Lead", "In Bearbeitung", "Angebot", "Abgeschlossen ✓"];
 const STAGE_COLORS = {
@@ -366,6 +398,24 @@ export default function CRM() {
 
         <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
           {page === "kanban" && inp(search, e => setSearch(e.target.value), "🔍 Suchen...", { width: 150 })}
+          <button 
+  onClick={() => importFromGoogleSheets(db.addContact)}
+  style={{ 
+    background: '#22c55e', 
+    color: 'white', 
+    border: 'none', 
+    borderRadius: '6px', 
+    padding: '4px 12px', 
+    cursor: 'pointer',
+    fontSize: '12px',
+    fontWeight: '600',
+    display: 'flex',
+    alignItems: 'center',
+    gap: '4px'
+  }}
+>
+  <span>📥</span> Import
+</button>
           <button onClick={() => setShowAdd(true)} style={{ background: "linear-gradient(135deg,#4f8ef7,#3a6fd8)", border: "none", borderRadius: 8, color: "#fff", padding: "7px 15px", fontSize: 11, fontWeight: 700, cursor: "pointer", whiteSpace: "nowrap" }}>+ Neuer Kontakt</button>
         </div>
       </div>
