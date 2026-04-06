@@ -58,8 +58,17 @@ const importFromGoogleSheets = async (updateDataCallback) => {
       result.push(obj);
     }
 
-    console.log("נתונים שיובאו:", result);
-    alert(`זוהו ${result.length} שורות מהטבלה!`);
+    // שליחת הנתונים ל-Database
+    for (const item of result) {
+      try {
+        // אנחנו משתמשים בפונקציה שכבר קיימת אצלך ב-API
+        await api("contacts", "POST", item); 
+      } catch (err) {
+        console.error("שגיאה בהוספת שורה:", item, err);
+      }
+    }
+
+    alert(`סיימתי! ${result.length} שורות הועלו בהצלחה ל-CRM.`);
     
     // אם יש לך פונקציה שמעדכנת את התצוגה, נפעיל אותה כאן
     if (updateDataCallback) updateDataCallback(result);
