@@ -38,33 +38,51 @@ const db = {
   getAllActions: () => api("actions?select=*"),
 };
 const importFromGoogleSheets = async (updateDataCallback) => {
-  const SHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSAd1CU3UtHejY7W0ulzY6_Zuu50yvW3jMKls-DuRxK805Q9SIiTVelddc5V-UCcdmTp5kEzSUIMc7u/pub?gid=247038876&single=true&output=csv";
-  
+  const SHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSAd1CU3UtHejY7W0ulzY6_Zuu50yvw3jMKls-DuRxK805Q9SIiTVelddc5V-UCcdmTp5kEzSUIMc7u/pub?gid=247038876&single=true&output=csv";
+
   try {
     const response = await fetch(SHEET_URL, { mode: 'cors' });
     const csvText = await response.text();
-    
-    // הפיכת ה-CSV למערך של אובייקטים
+
     const lines = csvText.trim().split('\n').filter(line => line.trim() !== '');
     const headers = lines[0].split(/[,;]/).map(h => h.trim());
     const result = [];
+
+    // הגדרת העמודות שקיימות אצלך ב-Supabase כדי לסנן זבל
+    const validColumns = ['name', 'phone', 'email', 'company', 'status']; // תוודא שאלו השמות ב-Supabase!
 
     for (let i = 1; i < lines.length; i++) {
       const obj = {};
       const currentline = lines[i].split(/[,;]/).map(v => v.trim());
       
       headers.forEach((header, index) => {
-        // אנחנו מוסיפים את הנתון רק אם יש לו כותרת והוא לא ריק
-        if (header && currentline[index] !== undefined) {
-          obj[header] = currentline[index] || null; // אם ריק, נשלח null
+        // שולח רק אם הכותרת קיימת ברשימת העמודות ב-Supabase
+        if (validColumns.includes(header)) {
+          obj[header] = currentline[index] || null;
         }
       });
 
-      // בדיקה: מוסיפים רק אם האובייקט לא ריק
       if (Object.keys(obj).length > 0) {
         result.push(obj);
       }
     }
+
+    console.log("נתונים מוכנים לשליחה:", result);
+
+    // שליחה אחת-אחת כדי למנוע קריסה של הכל בגלל שורה אחת
+    for (const item of result) {
+      await api("contacts", "POST", item);
+    }
+
+    alert(`הצלחנו! ${result.length} אנשי קשר נוספו למערכת.`);
+    if (updateDataCallback) updateDataCallback();
+
+  } catch (error) {
+    console.error("שגיאה בייבוא:", error);
+    alert("הייתה שגיאה בחיבור ל-Supabase. בדוק את ה-Console.");
+  }
+};
+
 
     // שליחת הנתונים ל-Database
     for (const item of result) {
