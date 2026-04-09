@@ -44,10 +44,11 @@ const importFromGoogleSheets = async (updateDataCallback) => {
     const response = await fetch(SHEET_URL);
     const csvText = await response.text();
 
-   const lines = csvText.split('\n').map(line => line.trim()).filter(line => line.length > 0);
+    const lines = csvText.split('\n').map(line => line.trim()).filter(line => line.length > 0);
+    // אנחנו מנקים את הכותרות מרווחים והופכים לאותיות קטנות
     const headers = lines[0].split(/[,;]/).map(h => h.trim().toLowerCase());
     
-    // רשימת העמודות שקיימות ב-Supabase שלך - רק אלו יעברו!
+    // רשימת העמודות המותרת - רק אלו יישלחו ל-Supabase!
     const validColumns = ['name', 'phone', 'email', 'company', 'status'];
     
     let successCount = 0;
@@ -57,12 +58,29 @@ const importFromGoogleSheets = async (updateDataCallback) => {
       const obj = {};
       
       headers.forEach((header, index) => {
-        if (validColumns.includes(header)) {
-          obj[header] = currentline[index] || null;
+        // אנחנו בודקים אם הכותרת נמצאת ברשימה המותרת שלנו
+        if (validColumns.includes(header) && currentline[index]) {
+          obj[header] = currentline[index];
         }
       });
 
+      // שולח רק אם הצלחנו לבנות אובייקט עם שם או חברה
       if (obj.name || obj.company) {
+        try {
+          // שליחה ישירה ללא המתנה ארוכה מדי
+          const res = await api("contacts", "POST", obj);
+          if (res && !res.error) {
+            successCount++;
+          }
+        } catch (err) {
+          // אם שורה אחת נכשלה, הקוד פשוט ממשיך לשורה הבאה
+          console.log(`דילגתי על שורה ${i}`);
+        }
+      }
+    }
+
+    alert(`סיימנו! ${successCount} לידים חדשים התווספו בהצלחה.`);
+    if (updateDataCallback) updateDataCallback();
         try {
           const res = await api("contacts", "POST", obj);
           if (res && !res.error) {
