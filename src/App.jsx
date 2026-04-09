@@ -44,8 +44,11 @@ const importFromGoogleSheets = async (updateDataCallback) => {
     const response = await fetch(SHEET_URL);
     const csvText = await response.text();
 
-    const lines = csvText.split('\n').map(line => line.trim()).filter(line => line.length > 0);
+   const lines = csvText.split('\n').map(line => line.trim()).filter(line => line.length > 0);
     const headers = lines[0].split(/[,;]/).map(h => h.trim());
+    
+    // רשימת העמודות שקיימות ב-Supabase שלך - תוודא שאלו השמות המדויקים!
+    const validColumns = ['name', 'phone', 'email', 'company', 'status'];
     
     let successCount = 0;
 
@@ -54,9 +57,26 @@ const importFromGoogleSheets = async (updateDataCallback) => {
       const obj = {};
       
       headers.forEach((header, index) => {
-        if (header) obj[header] = currentline[index] || null;
+        // מסנן רק את מה שמופיע ברשימת ה-validColumns
+        if (validColumns.includes(header)) {
+          obj[header] = currentline[index] || null;
+        }
       });
 
+      if (Object.keys(obj).length > 0) {
+        try {
+          const res = await api("contacts", "POST", obj);
+          if (res && !res.error) {
+            successCount++;
+          }
+        } catch (err) {
+          console.error(`שגיאה בשורה ${i}:`, err);
+        }
+      }
+    }
+
+    alert(`סיימנו! ${successCount} לידים נוספו בהצלחה.`);
+    if (updateDataCallback) updateDataCallback();
       try {
         // נקודה 2: אנחנו שולחים ובודקים אם ה-API מחזיר שגיאה
         const res = await api("contacts", "POST", obj);
