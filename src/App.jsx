@@ -47,7 +47,7 @@ const importFromGoogleSheets = async (updateDataCallback) => {
    const lines = csvText.split('\n').map(line => line.trim()).filter(line => line.length > 0);
     const headers = lines[0].split(/[,;]/).map(h => h.trim());
     
-    // רשימת העמודות שקיימות ב-Supabase שלך - תוודא שאלו השמות המדויקים!
+    // רשימת העמודות המותרות - הקוד יתעלם מכל מה שלא פה
     const validColumns = ['name', 'phone', 'email', 'company', 'status'];
     
     let successCount = 0;
@@ -57,11 +57,29 @@ const importFromGoogleSheets = async (updateDataCallback) => {
       const obj = {};
       
       headers.forEach((header, index) => {
-        // מסנן רק את מה שמופיע ברשימת ה-validColumns
+        // כאן הקסם: הוא לוקח רק את העמודות שיש ב-validColumns
         if (validColumns.includes(header)) {
           obj[header] = currentline[index] || null;
         }
       });
+
+      // שולח רק אם יש נתונים
+      if (Object.keys(obj).length > 0) {
+        try {
+          const res = await api("contacts", "POST", obj);
+          if (res && !res.error) {
+            successCount++;
+          } else {
+            console.log("דילגתי על שורה בעייתית");
+          }
+        } catch (err) {
+          // ממשיך לשורה הבאה גם אם יש שגיאה
+        }
+      }
+    }
+
+    alert(`הצלחנו! נוספו עוד ${successCount} לידים.`);
+    if (updateDataCallback) updateDataCallback();
 
       if (Object.keys(obj).length > 0) {
         try {
