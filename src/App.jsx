@@ -44,13 +44,11 @@ const importFromGoogleSheets = async (updateDataCallback) => {
     const response = await fetch(SHEET_URL);
     const csvText = await response.text();
 
-    // פיצול לשורות וניקוי שורות ריקות
     const lines = csvText.split('\n').map(line => line.trim()).filter(line => line.length > 0);
     const headers = lines[0].split(/[,;]/).map(h => h.trim());
     
     let successCount = 0;
 
-    // רצים על כל השורות (מדלגים על הכותרת)
     for (let i = 1; i < lines.length; i++) {
       const currentline = lines[i].split(/[,;]/).map(v => v.trim());
       const obj = {};
@@ -60,13 +58,26 @@ const importFromGoogleSheets = async (updateDataCallback) => {
       });
 
       try {
-        // שליחה של ליד בודד בכל פעם
-        await api("contacts", "POST", obj);
-        successCount++;
+        // נקודה 2: אנחנו שולחים ובודקים אם ה-API מחזיר שגיאה
+        const res = await api("contacts", "POST", obj);
+        if (res && res.error) {
+          console.error(`שגיאת Supabase בשורה ${i}:`, res.error);
+        } else {
+          successCount++;
+        }
       } catch (err) {
-        console.error(`שגיאה בשורה ${i}:`, err);
+        console.error(`שגיאה טכנית בשורה ${i}:`, err);
       }
     }
+
+    alert(`סיימתי! ${successCount} לידים נוספו בהצלחה מתוך ${lines.length - 1}.`);
+    if (updateDataCallback) updateDataCallback();
+
+  } catch (error) {
+    console.error("שגיאה כללית בייבוא:", error);
+    alert("הייתה שגיאה במשיכת הקובץ מגוגל.");
+  }
+};
 
     alert(`סיימתי! ${successCount} לידים נוספו בהצלחה מתוך ${lines.length - 1}.`);
     
