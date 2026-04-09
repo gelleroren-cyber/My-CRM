@@ -41,25 +41,46 @@ const importFromGoogleSheets = async (updateDataCallback) => {
   const SHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSAd1CU3UtHejY7W0ulzY6_Zuu50yvw3jMKls-DuRxK805Q9SIiTVelddc5V-UCcdmTp5kEzSUIMc7u/pub?gid=247038876&single=true&output=csv";
 
   try {
-    const response = await fetch(SHEET_URL, { mode: 'cors' });
+    const response = await fetch(SHEET_URL);
     const csvText = await response.text();
 
-    const lines = csvText.trim().split('\n').filter(line => line.trim() !== '');
+    // פיצול לשורות וניקוי שורות ריקות
+    const lines = csvText.split('\n').map(line => line.trim()).filter(line => line.length > 0);
     const headers = lines[0].split(/[,;]/).map(h => h.trim());
-    const result = [];
+    
+    let successCount = 0;
 
-    // הגדרת העמודות שקיימות אצלך ב-Supabase כדי לסנן זבל
-    const validColumns = ['name', 'phone', 'email', 'company', 'status']; // תוודא שאלו השמות ב-Supabase!
-
+    // רצים על כל השורות (מדלגים על הכותרת)
     for (let i = 1; i < lines.length; i++) {
-      const obj = {};
       const currentline = lines[i].split(/[,;]/).map(v => v.trim());
+      const obj = {};
       
       headers.forEach((header, index) => {
-        // שולח רק אם הכותרת קיימת ברשימת העמודות ב-Supabase
-        if (validColumns.includes(header)) {
-          obj[header] = currentline[index] || null;
-        }
+        if (header) obj[header] = currentline[index] || null;
+      });
+
+      try {
+        // שליחה של ליד בודד בכל פעם
+        await api("contacts", "POST", obj);
+        successCount++;
+      } catch (err) {
+        console.error(`שגיאה בשורה ${i}:`, err);
+      }
+    }
+
+    alert(`סיימתי! ${successCount} לידים נוספו בהצלחה מתוך ${lines.length - 1}.`);
+    
+    if (updateDataCallback) {
+      // טעינה מחדש של הנתונים כדי שתראה אותם על המסך
+      const freshData = await api("contacts?select=*");
+      updateDataCallback(freshData);
+    }
+
+  } catch (error) {
+    console.error("שגיאה כללית בייבוא:", error);
+    alert("הייתה שגיאה במשיכת הקובץ מגוגל.");
+  }
+};
       });
 
       if (Object.keys(obj).length > 0) {
