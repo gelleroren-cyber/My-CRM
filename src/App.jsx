@@ -44,18 +44,37 @@ const importFromGoogleSheets = async (updateDataCallback) => {
     const response = await fetch(SHEET_URL);
     const csvText = await response.text();
 
-    const lines = csvText.split('\n').map(line => line.trim()).filter(line => line.length > 0);
-    // אנחנו מנקים את הכותרות מרווחים והופכים לאותיות קטנות
-    const headers = lines[0].split(/[,;]/).map(h => h.trim().toLowerCase());
+   const lines = csvText.split('\n').map(line => line.trim()).filter(line => line.length > 0);
+    const headers = lines[0].split(/[,;]/).map(h => h.trim());
     
-    // רשימת העמודות המותרת - רק אלו יישלחו ל-Supabase!
-    const validColumns = ['name', 'phone', 'email', 'company', 'status'];
+    // רשימת העמודות שקיימות ב-Supabase שלך - הוספנו את antwort!
+    const validColumns = ['name', 'phone', 'email', 'company', 'status', 'Antwort'];
     
     let successCount = 0;
 
     for (let i = 1; i < lines.length; i++) {
       const currentline = lines[i].split(/[,;]/).map(v => v.trim());
       const obj = {};
+      
+      headers.forEach((header, index) => {
+        // שולח רק אם העמודה קיימת בשיטס וגם מוגדרת ב-Supabase
+        if (validColumns.includes(header)) {
+          obj[header] = currentline[index] || null;
+        }
+      });
+
+      if (obj.name || obj.company) {
+        try {
+          await api("contacts", "POST", obj);
+          successCount++;
+        } catch (err) {
+          console.error("שגיאה בשורה " + i, err);
+        }
+      }
+    }
+
+    alert(`סיימנו! ${successCount} לידים נוספו עם כל הנתונים.`);
+    if (updateDataCallback) updateDataCallback();
       
       headers.forEach((header, index) => {
         // אנחנו בודקים אם הכותרת נמצאת ברשימה המותרת שלנו
