@@ -114,8 +114,7 @@ const importFromGoogleSheets = async (updateDataCallback) => {
     const headers = lines[0].split(/[,;]/).map(h => h.trim());
     
     // Whitelist: Nur diese Felder gehen an Supabase.
-    const allowedFields = ['name', 'phone', 'email', 'company', 'status', 'Antwort', 'position', 'linkedin'];
-    
+const [newContact, setNewContact] = useState({ name: "", company: "", phone: "", email: "", position: "", linkedin: "", stage: "Neuer Lead", note: "" });    
     let successCount = 0;
     for (let i = 1; i < lines.length; i++) {
       const currentline = lines[i].split(/[,;]/).map(v => v.trim());
