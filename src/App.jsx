@@ -103,6 +103,41 @@ const importFromGoogleSheets = async (updateDataCallback) => {
         // אנחנו בודקים אם הכותרת נמצאת ברשימה המותרת שלנו
         if (validColumns.includes(header) && currentline[index]) {
           obj[header] = currentline[index];
+
+const importFromGoogleSheets = async (updateDataCallback) => {
+  const SHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSAd1CU3UtHejY7W0ulzY6_Zuu50yvw3jMKls-DuRxK805Q9SIiTVelddc5V-UCcdmTp5kEzSUIMc7u/pub?gid=247038876&single=true&output=csv";
+
+  try {
+    const response = await fetch(SHEET_URL);
+    const csvText = await response.text();
+    const lines = csvText.split('\n').map(line => line.trim()).filter(line => line.length > 0);
+    const headers = lines[0].split(/[,;]/).map(h => h.trim());
+    
+    // Whitelist: Nur diese Felder gehen an Supabase.
+    const allowedFields = ['name', 'phone', 'email', 'company', 'status', 'Antwort', 'position', 'linkedin'];
+    
+    let successCount = 0;
+    for (let i = 1; i < lines.length; i++) {
+      const currentline = lines[i].split(/[,;]/).map(v => v.trim());
+      const obj = {};
+      headers.forEach((header, index) => {
+        if (allowedFields.includes(header)) {
+          obj[header] = currentline[index] || null;
+        }
+      });
+
+      if (obj.name || obj.company) {
+        try {
+          await api("contacts", "POST", obj);
+          successCount++;
+        } catch (err) { console.error("Fehler Zeile " + i); }
+      }
+    }
+    alert(`Import fertig! ${successCount} Kontakte geladen.`);
+    if (updateDataCallback) updateDataCallback();
+  } catch (error) { alert("Fehler beim Abrufen der Tabelle."); }
+};
+          
         }
       });
 
@@ -407,7 +442,7 @@ export default function CRM() {
   const [tasks, setTasks] = useState([]);
   const [actions, setActions] = useState([]);
   const [showAdd, setShowAdd] = useState(false);
-  const [newContact, setNewContact] = useState({ name: "", company: "", phone: "", email: "", stage: "Neuer Lead", note: "" });
+{[["name", "Name *"], ["company", "Unternehmen"], ["phone", "Telefon"], ["email", "E-Mail"], ["position", "Position"], ["linkedin", "LinkedIn URL"]].map(([field, label]) => (
   const [newTaskText, setNewTaskText] = useState("");
   const [newAction, setNewAction] = useState({ type: "Anruf", date: todayStr(), note: "" });
   const [search, setSearch] = useState("");
