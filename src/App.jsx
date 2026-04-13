@@ -43,37 +43,40 @@ const importFromGoogleSheets = async (updateDataCallback) => {
   try {
     const response = await fetch(SHEET_URL);
     const csvText = await response.text();
-
-   const lines = csvText.split('\n').map(line => line.trim()).filter(line => line.length > 0);
+    const lines = csvText.split('\n').map(line => line.trim()).filter(line => line.length > 0);
     const headers = lines[0].split(/[,;]/).map(h => h.trim());
     
-    // כאן הרשימה הסופית - רק מה שמופיע כאן יישלח ל-Supabase!
-    // הוספתי את Antwort כי כבר יצרת אותה ב-Database
-    const allowedFields = ['name', 'phone', 'email', 'company', 'status', 'Antwort'];
+    // WICHTIG: Hier sind alle Felder, die wir in Supabase haben.
+    // Alles andere (wie Kontaktart) wird ignoriert.
+    const allowedFields = ['name', 'phone', 'email', 'company', 'status', 'Antwort', 'position', 'linkedin'];
     
     let successCount = 0;
-
     for (let i = 1; i < lines.length; i++) {
       const currentline = lines[i].split(/[,;]/).map(v => v.trim());
       const obj = {};
       
       headers.forEach((header, index) => {
-        // אם הכותרת מהשיטס נמצאת ברשימה המותרת שלנו - רק אז נוסיף אותה
         if (allowedFields.includes(header)) {
           obj[header] = currentline[index] || null;
         }
       });
 
-      // שולח רק אם יש לפחות שם או חברה
       if (obj.name || obj.company) {
         try {
-          await api("contacts", "POST", obj);
-          successCount++;
+          // Wir senden die Daten an Supabase
+          const res = await api("contacts", "POST", obj);
+          if (res && !res.error) successCount++;
         } catch (err) {
-          console.error("דילוג על שורה בעייתית", err);
+          console.error("Zeile übersprungen:", i);
         }
       }
     }
+    alert(`Import abgeschlossen! ${successCount} Kontakte hinzugefügt.`);
+    if (updateDataCallback) updateDataCallback();
+  } catch (error) {
+    alert("Fehler beim Import.");
+  }
+};
 
     alert(`הצלחה! ${successCount} לידים נוספו למערכת.`);
     if (updateDataCallback) updateDataCallback();
