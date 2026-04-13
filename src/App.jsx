@@ -262,6 +262,7 @@ const importFromGoogleSheets = async (updateDataCallback) => {
     if (updateDataCallback) updateDataCallback();
 
   } catch (error) {
+    <button onClick={() => importFromGoogleSheets(loadAll)} style={{ background: "#1e3a5f", border: "1px solid #4f8ef7", borderRadius: 8, color: "#4f8ef7", padding: "7px 15px", fontSize: 11, fontWeight: 700, cursor: "pointer", marginRight: "8px" }}>📥 Google Import</button>
     console.error("שגיאה בייבוא:", error);
     alert("הייתה שגיאה בחיבור ל-Supabase. בדוק את ה-Console.");
   }
