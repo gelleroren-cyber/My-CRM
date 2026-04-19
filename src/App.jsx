@@ -435,18 +435,29 @@ export default function CRM() {
             </select>
           </div>
 
+         {/* Contact Info */}
           <div style={{ padding: "11px 15px", borderBottom: "1px solid #1a1a32" }}>
-            {[["📞", selected.phone], ["✉️", selected.email]].map(([icon, val]) => (
-              val ? <div key={icon} style={{ display: "flex", gap: 7, marginBottom: 5, fontSize: 11, color: "#9090b0" }}><span>{icon}</span><span>{val}</span></div> : null
+            {[["Name *", "name"], ["Unternehmen", "company"], ["Telefon", "phone"], ["E-Mail", "email"]].map(([label, field]) => (
+              <div key={field} style={{ marginBottom: 6 }}>
+                <div style={{ fontSize: 9, color: "#5060a0", marginBottom: 2 }}>{label}</div>
+                <input
+                  key={selected.id + "-" + field}
+                  defaultValue={selected[field] || ""}
+                  onBlur={e => handleUpdateField(field, e.target.value)}
+                  style={{ width: "100%", background: "#16162e", border: "1px solid #2a2a4a", borderRadius: 7, color: "#c0c0e0", padding: "6px 9px", fontSize: 11, outline: "none", boxSizing: "border-box" }}
+                />
+              </div>
             ))}
-            <input
-              key={selected.id + "-position"}
-              defaultValue={selected.position || ""}
-              onBlur={e => handleUpdateField("position", e.target.value)}
-              placeholder="💼 Position / Jobtitel..."
-              style={{ width: "100%", marginTop: 6, background: "#16162e", border: "1px solid #2a2a4a", borderRadius: 7, color: "#c0c0e0", padding: "6px 9px", fontSize: 11, outline: "none", boxSizing: "border-box" }}
-            />
-            <div style={{ display: "flex", alignItems: "center", gap: 6, marginTop: 6 }}>
+            <div style={{ marginBottom: 6 }}>
+              <div style={{ fontSize: 9, color: "#5060a0", marginBottom: 2 }}>Position / Jobtitel</div>
+              <input
+                key={selected.id + "-position"}
+                defaultValue={selected.position || ""}
+                onBlur={e => handleUpdateField("position", e.target.value)}
+                style={{ width: "100%", background: "#16162e", border: "1px solid #2a2a4a", borderRadius: 7, color: "#c0c0e0", padding: "6px 9px", fontSize: 11, outline: "none", boxSizing: "border-box" }}
+              />
+            </div>
+            <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 6 }}>
               <span style={{ fontSize: 13 }}>🔗</span>
               <input
                 key={selected.id + "-linkedin"}
@@ -468,7 +479,7 @@ export default function CRM() {
               onBlur={e => handleUpdateNote(e.target.value)}
               placeholder="Notiz hinzufügen..."
               rows={2}
-              style={{ width: "100%", marginTop: 6, background: "#16162e", border: "1px solid #2a2a4a", borderRadius: 7, color: "#c0c0e0", padding: "6px 9px", fontSize: 11, resize: "none", outline: "none", fontFamily: "inherit", boxSizing: "border-box" }}
+              style={{ width: "100%", background: "#16162e", border: "1px solid #2a2a4a", borderRadius: 7, color: "#c0c0e0", padding: "6px 9px", fontSize: 11, resize: "none", outline: "none", fontFamily: "inherit", boxSizing: "border-box" }}
             />
           </div>
 
