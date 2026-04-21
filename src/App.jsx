@@ -494,31 +494,31 @@ export default function CRM() {
         ::-webkit-scrollbar-thumb { background: #2a2a4a; border-radius: 4px; }
       `}</style>
 
-      {/* Header */}
-      <div style={{ padding: "11px 14px", background: "#0d0d1a", borderBottom: "1px solid #1e1e3a", display: "flex", alignItems: "center", gap: 8, position: "sticky", top: 0, zIndex: 50 }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 9, flexShrink: 0 }}>
-          <div style={{ width: 30, height: 30, borderRadius: 8, background: "linear-gradient(135deg,#4f8ef7,#b44ff7)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, fontWeight: 900, color: "#fff" }}>C</div>
-          <div>
-            <div style={{ fontSize: 13, fontWeight: 800, color: "#fff" }}>Mein CRM</div>
-            <div style={{ fontSize: 9, color: "#4a4a6a" }}>{contacts.length} Kontakte{saving ? " · Speichert..." : ""}</div>
-          </div>
-        </div>
-        <div style={{ display: "flex", gap: 3, background: "#13132a", borderRadius: 8, padding: 3, flexShrink: 0 }}>
-          {[["kanban", "🗂"], ["stats", "📊"]].map(([p, icon]) => (
-            <button key={p} onClick={() => setPage(p)} style={{ position: "relative", background: page === p ? "linear-gradient(135deg,#4f8ef7,#3a6fd8)" : "none", border: "none", borderRadius: 6, color: "#fff", padding: "5px 11px", fontSize: 15, cursor: "pointer" }}>
-              {icon}
-              {p === "stats" && overdueCount > 0 && <span style={{ position: "absolute", top: 0, right: 0, background: "#f74f4f", borderRadius: 10, fontSize: 8, fontWeight: 900, color: "#fff", padding: "1px 3px" }}>{overdueCount}</span>}
-            </button>
-          ))}
-        </div>
-<div style={{ display: "flex", gap: 6, alignItems: "center", marginLeft: 12 }}>
-        {page === "kanban" && window.innerWidth >= 480 && (
-          <input value={search} onChange={e => setSearch(e.target.value)} placeholder="🔍 Suchen..."
-              style={{ background: "#16162e", border: "1px solid #2a2a4a", borderRadius: 7, color: "#e8e8f0", padding: "6px 10px", fontSize: 13, outline: "none", flex: 1, maxWidth: 160, minWidth: 80 }} />
-          )}
-<button onClick={() => setShowAdd(true)} style={{ background: "linear-gradient(135deg,#4f8ef7,#3a6fd8)", border: "none", borderRadius: 8, color: "#fff", padding: "7px 14px", fontSize: 13, fontWeight: 700, cursor: "pointer", whiteSpace: "nowrap", flexShrink: 0, marginRight: 4 }}>+ Neu</button>
+     {/* Header */}
+<div style={{ padding: "11px 14px", background: "#0d0d1a", borderBottom: "1px solid #1e1e3a", display: "flex", alignItems: "center", gap: 8, position: "sticky", top: 0, zIndex: 50 }}>
+  <div style={{ display: "flex", alignItems: "center", gap: 9, flexShrink: 0 }}>
+    <div style={{ width: 30, height: 30, borderRadius: 8, background: "linear-gradient(135deg,#4f8ef7,#b44ff7)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, fontWeight: 900, color: "#fff" }}>C</div>
+    <div>
+      <div style={{ fontSize: 13, fontWeight: 800, color: "#fff" }}>Mein CRM</div>
+      <div style={{ fontSize: 9, color: "#4a4a6a" }}>{contacts.length} Kontakte{saving ? " · Speichert..." : ""}</div>
+    </div>
+  </div>
+  <div style={{ display: "flex", gap: 3, background: "#13132a", borderRadius: 8, padding: 3, flexShrink: 0 }}>
+    {[["kanban", "🗂"], ["stats", "📊"]].map(([p, icon]) => (
+      <button key={p} onClick={() => setPage(p)} style={{ position: "relative", background: page === p ? "linear-gradient(135deg,#4f8ef7,#3a6fd8)" : "none", border: "none", borderRadius: 6, color: "#fff", padding: "5px 11px", fontSize: 15, cursor: "pointer" }}>
+        {icon}
+        {p === "stats" && overdueCount > 0 && <span style={{ position: "absolute", top: 0, right: 0, background: "#f74f4f", borderRadius: 10, fontSize: 8, fontWeight: 900, color: "#fff", padding: "1px 3px" }}>{overdueCount}</span>}
+      </button>
+    ))}
+  </div>
+  <div style={{ display: "flex", gap: 6, alignItems: "center", marginLeft: 12 }}>
+    {page === "kanban" && window.innerWidth >= 480 && (
+      <input value={search} onChange={e => setSearch(e.target.value)} placeholder="🔍 Suchen..."
+        style={{ background: "#16162e", border: "1px solid #2a2a4a", borderRadius: 7, color: "#e8e8f0", padding: "6px 10px", fontSize: 13, outline: "none", width: 160 }} />
+    )}
+    <button onClick={() => setShowAdd(true)} style={{ background: "linear-gradient(135deg,#4f8ef7,#3a6fd8)", border: "none", borderRadius: 8, color: "#fff", padding: "7px 14px", fontSize: 13, fontWeight: 700, cursor: "pointer", whiteSpace: "nowrap" }}>+ Neu</button>
+  </div>
 </div>
-      </div>
 
       {/* Pages */}
       {page === "stats" ? (
