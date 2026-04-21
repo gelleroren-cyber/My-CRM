@@ -511,7 +511,7 @@ export default function CRM() {
             </button>
           ))}
         </div>
-<div style={{ display: "flex", gap: 6, flex: 1, justifyContent: "flex-end", alignItems: "center", overflow: "hidden" }}>
+<div style={{ display: "flex", gap: 6, flex: 1, justifyContent: "center", alignItems: "center", overflow: "hidden" }}>
         {page === "kanban" && window.innerWidth >= 480 && (
           <input value={search} onChange={e => setSearch(e.target.value)} placeholder="🔍 Suchen..."
               style={{ background: "#16162e", border: "1px solid #2a2a4a", borderRadius: 7, color: "#e8e8f0", padding: "6px 10px", fontSize: 13, outline: "none", flex: 1, maxWidth: 160, minWidth: 80 }} />
