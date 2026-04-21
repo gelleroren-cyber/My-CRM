@@ -534,7 +534,7 @@ export default function CRM() {
                 onDragOver={e => { e.preventDefault(); setDragOver(stage); }}
                 onDragLeave={() => setDragOver(null)}
                 onDrop={e => handleDrop(e, stage)}
-                style={{ minWidth: "calc(85vw)", maxWidth: 280, flexShrink: 0, scrollSnapAlign: "start", background: isOver ? "#1a1a35" : "#13132a", borderRadius: 12, border: `1.5px solid ${isOver ? col.accent : "#1e1e3a"}`, transition: "all 0.2s", padding: "0 0 10px", height: "calc(100vh - 100px)", display: "flex", flexDirection: "column" }}>
+                style={{ minWidth: 220, width: 220, flexShrink: 0, scrollSnapAlign: "start", background: isOver ? "#1a1a35" : "#13132a", borderRadius: 12, border: `1.5px solid ${isOver ? col.accent : "#1e1e3a"}`, transition: "all 0.2s", padding: "0 0 10px", height: "calc(100vh - 100px)", display: "flex", flexDirection: "column" }}>
                 <div style={{ padding: "11px 12px 8px", borderBottom: "1px solid #1e1e3a", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
                   <span style={{ fontWeight: 700, fontSize: 12, color: col.accent }}>{stage}</span>
                   <span style={{ background: col.badge, color: col.accent, borderRadius: 20, fontSize: 9, fontWeight: 700, padding: "2px 7px" }}>{cards.length}</span>
